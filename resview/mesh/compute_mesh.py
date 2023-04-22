@@ -7,7 +7,7 @@ Usage:
     Additional arguments for skimage.measure.marching_cubes can be passed as keyword arguments.
     
 Returns:
-    A MedMarch object with the following attributes:
+    A ResMesh object with the following attributes:
         vertices: A numpy array of shape (n, 3) containing the vertices of the mesh.
         faces: A numpy array of shape (m, 3) containing the faces of the mesh.
         normals: A numpy array of shape (n, 3) containing the normals of the mesh.
@@ -18,7 +18,7 @@ from skimage import measure
 from typing import Any, Dict, Tuple
 
 
-class MedMarch:
+class ResMesh:
     """ Class to store the results of skimage.measure.marching_cubes """
     
     def __init__(self, vertices: np.ndarray, faces: np.ndarray, normals: np.ndarray, values: np.ndarray):
@@ -28,7 +28,7 @@ class MedMarch:
         self.values = values
 
     def __repr__(self) -> str:
-        return f"MedMarch(vertices={self.vertices.shape}, faces={self.faces.shape}, normals={self.normals.shape}, values={self.values.shape})"
+        return f"ResMesh(vertices={self.vertices.shape}, faces={self.faces.shape}, normals={self.normals.shape}, values={self.values.shape})"
         
     @property
     def vertices(self) -> np.ndarray:
@@ -71,7 +71,7 @@ class MedMarch:
         self._values = values
         
 
-def compute(volume: np.ndarray, threshold: float, **kwargs: Dict[str, Any]) -> MedMarch:
+def compute_mesh(volume: np.ndarray, threshold: float, **kwargs: Dict[str, Any]) -> ResMesh:
     """ Wrapper for skimage.measure.marching_cubes """
 
     if not isinstance(volume, np.ndarray) or volume.ndim != 3:
@@ -85,4 +85,4 @@ def compute(volume: np.ndarray, threshold: float, **kwargs: Dict[str, Any]) -> M
     except Exception as e:
         raise RuntimeError(f"Error encountered while computing marching cubes: {str(e)}")
     
-    return MedMarch(vertices, faces, normals, values)
+    return ResMesh(vertices, faces, normals, values)
