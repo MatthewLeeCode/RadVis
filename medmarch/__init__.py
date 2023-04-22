@@ -1,3 +1,3 @@
-from .compute_mesh import compute
+from .mesh import compute
 
 __all__ = ["compute"]

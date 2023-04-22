@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 import medmarch
-from medmarch.compute_mesh import MedMarch
+from medmarch.mesh.compute_mesh import MedMarch
 
 
 def test_init():
