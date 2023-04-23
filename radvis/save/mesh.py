@@ -1,9 +1,9 @@
 import meshio
 from radvis.mesh import RadMesh
 
-def export_radmesh(radmesh: RadMesh, file_path: str, file_format: str):
+def save_radmesh(radmesh: RadMesh, file_path: str, file_format: str):
     """
-    Export a RadMesh object to a specified file format.
+    Save a RadMesh object to a specified file format.
 
     Args:
         radmesh (RadMesh): the RadMesh object to export
@@ -15,5 +15,6 @@ def export_radmesh(radmesh: RadMesh, file_path: str, file_format: str):
     if file_format.lower() not in supported_formats:
         raise ValueError(f"Unsupported file format '{file_format}'. Supported formats are {', '.join(supported_formats)}")
 
-    mesh = meshio.Mesh(points=radmesh.vertices, cells=[("triangle", radmesh.faces)])
+    mesh = meshio.Mesh(points=radmesh.vertices, cells=[("triangle", radmesh.faces)], point_data={
+                       "Normals": radmesh.normals, "Values": radmesh.values})
     meshio.write(file_path, mesh, file_format=file_format.lower())

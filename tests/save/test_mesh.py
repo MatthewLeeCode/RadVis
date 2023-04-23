@@ -3,7 +3,7 @@ import tempfile
 import numpy as np
 import re
 from radvis.mesh import RadMesh
-from radvis.export import export_radmesh
+from radvis.save import save_radmesh
 
 
 def create_test_radmesh():
@@ -15,7 +15,7 @@ def create_test_radmesh():
     return RadMesh(vertices, faces, normals, values)
 
 
-def test_export_radmesh_supported_formats():
+def test_save_radmesh_supported_formats():
     radmesh = create_test_radmesh()
     supported_formats = ["stl", "obj", "ply", "vtk"]
 
@@ -23,19 +23,19 @@ def test_export_radmesh_supported_formats():
         fd, temp_file = tempfile.mkstemp(suffix=f".{file_format}")
         os.close(fd)
         try:
-            export_radmesh(radmesh, temp_file, file_format)
+            save_radmesh(radmesh, temp_file, file_format)
             assert os.path.exists(temp_file)
         finally:
             os.remove(temp_file)
 
 
-def test_export_radmesh_unsupported_format():
+def test_save_radmesh_unsupported_format():
     radmesh = create_test_radmesh()
 
     fd, temp_file = tempfile.mkstemp(suffix=".unsupported")
     os.close(fd)
     try:
-        export_radmesh(radmesh, temp_file, "unsupported")
+        save_radmesh(radmesh, temp_file, "unsupported")
     except ValueError as ve:
         # Extract the supported formats from the error message
         error_message = str(ve)
