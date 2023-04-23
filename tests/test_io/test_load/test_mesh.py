@@ -2,8 +2,8 @@ import os
 import tempfile
 import numpy as np
 from radvis.mesh import RadMesh
-from radvis.save.mesh import save_radmesh
-from radvis.load.mesh import load_radmesh
+from radvis.io.save.mesh import save_radmesh
+from radvis.io.load.mesh import load_radmesh
 
 def create_test_radmesh():
     vertices = np.array([

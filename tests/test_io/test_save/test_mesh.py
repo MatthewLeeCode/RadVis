@@ -3,7 +3,7 @@ import tempfile
 import numpy as np
 import re
 from radvis.mesh import RadMesh
-from radvis.save import save_radmesh
+from radvis.io.save import save_radmesh
 
 
 def create_test_radmesh():
