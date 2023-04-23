@@ -1,3 +1,3 @@
-from .three_dimensional import create_figure, add_mesh, add_volume, show_figure
+from .slice import display_radimage_slices
 
-__all__ = ['create_figure', 'add_mesh', 'add_volume', 'show_figure']
+__all__ = ['display_radimage_slices']

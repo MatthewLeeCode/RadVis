@@ -1,8 +1,6 @@
 import os
 from abc import ABC, abstractmethod
 from typing import Optional
-import pydicom
-import nibabel as nib
 import numpy as np
 
 
@@ -37,3 +35,27 @@ class RadImage(ABC):
         :param output_file_path: The output file path to save the image
         """
         pass
+    
+    def get_image_info(self) -> str:
+        """
+        Return information about the image shape and header.
+        """
+        if self.image_data is None:
+            return "Image data not loaded"
+
+        # Get the shape of the image
+        shape_str = f"Shape: {self.image_data.shape}"
+
+        # Get the header information
+        header_str = ""
+        if self.metadata is not None:
+            for key, value in self.metadata.items():
+                header_str += f"{key}: {value}\n"
+
+        return f"{shape_str}\n{header_str}"
+
+    def __recv__(self) -> str:
+        """
+        Return a string representation of the image data.
+        """
+        return self.get_image_info()

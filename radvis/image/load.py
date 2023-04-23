@@ -10,13 +10,10 @@ def load_image(file_path: str) -> RadImage:
     :param file_path: The file path to the image file
     :return: An instance of a RadImage subclass for the corresponding file format
     """
-    abs_path = os.path.abspath(file_path)
-    _, extension = os.path.splitext(abs_path)
-    extension = extension.lower()
-
-    if extension == ".dcm":
-        return RadDicomImage(abs_path)
-    elif extension in (".nii", ".nii.gz"):
-        return RadNiftiImage(abs_path)
+    if file_path.find(".dcm") != -1:
+        return RadDicomImage(file_path)
+    elif file_path.find(".nii") != -1:
+        return RadNiftiImage(file_path)
     else:
+        extension = os.path.splitext(file_path)[1]
         raise ValueError(f"Unsupported file format: {extension}")
