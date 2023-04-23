@@ -1,5 +1,5 @@
 import ipyvolume as ipv
-from ..mesh.compute_mesh import ResMesh
+from ..mesh.compute_mesh import RadMesh
 import numpy as np
 
 
@@ -13,16 +13,16 @@ def create_figure() -> ipv.Figure:
     return fig
 
 
-def add_mesh(fig: ipv.Figure, resmesh: ResMesh, color: str = 'orange') -> ipv.Figure:
+def add_mesh(fig: ipv.Figure, radmesh: RadMesh, color: str = 'orange') -> ipv.Figure:
     """
-    Add a mesh from a ResMesh object to an ipyvolume figure.
+    Add a mesh from a RadMesh object to an ipyvolume figure.
 
     :param fig: The ipyvolume figure to add the mesh to.
-    :param resmesh: The ResMesh object containing the mesh data.
+    :param radmesh: The RadMesh object containing the mesh data.
     :param color: The color of the mesh, can be a hex or RGB value. Default is 'orange'.
     :return: The ipyvolume figure with the mesh added.
     """
-    mesh_color = ipv.plot_trisurf(resmesh.vertices[:, 0], resmesh.vertices[:, 1], resmesh.vertices[:, 2], triangles=resmesh.faces, color=color)
+    mesh_color = ipv.plot_trisurf(radmesh.vertices[:, 0], radmesh.vertices[:, 1], radmesh.vertices[:, 2], triangles=radmesh.faces, color=color)
     mesh_color.material.color = color
     return fig
 

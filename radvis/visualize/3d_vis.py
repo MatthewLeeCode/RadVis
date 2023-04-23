@@ -1,5 +1,5 @@
 import ipyvolume as ipv
-from med.mesh.compute_mesh import MedMarch
+from radvis.mesh import RadMesh
 import numpy as np
 
 
@@ -13,16 +13,16 @@ def create_figure() -> ipv.Figure:
     return fig
 
 
-def add_mesh(fig: ipv.Figure, medmarch: MedMarch, color: str = 'orange') -> ipv.Figure:
+def add_mesh(fig: ipv.Figure, radmesh: RadMesh, color: str = 'orange') -> ipv.Figure:
     """
-    Add a mesh from a MedMarch object to an ipyvolume figure.
+    Add a mesh from a RadMesh object to an ipyvolume figure.
 
     :param fig: The ipyvolume figure to add the mesh to.
-    :param medmarch: The MedMarch object containing the mesh data.
+    :param radmesh: The RadMesh object containing the mesh data.
     :param color: The color of the mesh, can be a hex or RGB value. Default is 'orange'.
     :return: The ipyvolume figure with the mesh added.
     """
-    mesh_color = ipv.plot_trisurf(medmarch.vertices[:, 0], medmarch.vertices[:, 1], medmarch.vertices[:, 2], triangles=medmarch.faces, color=color)
+    mesh_color = ipv.plot_trisurf(radmesh.vertices[:, 0], radmesh.vertices[:, 1], radmesh.vertices[:, 2], triangles=radmesh.faces, color=color)
     mesh_color.material.color = color
     return fig
 
