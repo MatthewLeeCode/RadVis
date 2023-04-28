@@ -1,4 +1,3 @@
-import os
 from abc import ABC, abstractmethod
 from typing import Optional
 import numpy as np
@@ -54,8 +53,41 @@ class RadImage(ABC):
 
         return f"{shape_str}\n{header_str}"
 
+    def get_slice(self, index: int, axis: int = 0) -> np.ndarray:
+        """
+        Get a 2D slice of the image data along the specified axis and index.
+
+        :param index: The index of the slice to take
+        :param axis: The axis along which to take the slice
+        :return: A 2D slice of the image data
+        """
+        if self.image_data is None:
+            raise ValueError("Image data not loaded")
+
+        # Checks that axis is within the bounds of the image data
+        if axis < 0 or axis >= len(self.image_data.shape):
+            raise ValueError(f"Axis {axis} is out of bounds for image data of shape {self.image_data.shape}")
+        
+        # Checks that the index is within the bounds of the image data
+        if index < 0 or index >= self.image_data.shape[axis]:
+            raise ValueError(f"Index {index} is out of bounds for axis {axis}")
+        
+        # Swap the desired axis with the first axis
+        data = np.swapaxes(self.image_data, 0, axis)
+
+        # Select the slice along the first axis
+        slice_2d = data[index]
+
+        return slice_2d
+
     def __recv__(self) -> str:
         """
         Return a string representation of the image data.
         """
         return self.get_image_info()
+    
+    def __getitem__(self, value:list) -> np.ndarray:
+        """
+        Return the image data at the given index.
+        """
+        return self.image_data[value]
