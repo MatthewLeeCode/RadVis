@@ -1,3 +1,3 @@
-from .image_slices import plot_slice
+from .rad_slicer import RadSlicer
 
-__all__ = ['plot_slice']
+__all__ = ['RadSlicer']

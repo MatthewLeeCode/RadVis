@@ -17,6 +17,15 @@ class RadImage(ABC):
         if self.file_path:
             self.load()
 
+    @property
+    def shape(self) -> tuple:
+        """
+        Return the shape of the image data.
+        """
+        if self.image_data is None:
+            return None
+        return self.image_data.shape
+
     @abstractmethod
     def load(self) -> None:
         """
