@@ -16,19 +16,20 @@ Returns:
 import numpy as np
 from skimage import measure
 from typing import Any, Dict
-from .rad_mesh import RadMesh        
+from .rad_mesh import RadMesh    
+from radvis.image.rad_image import RadImage    
 
-def compute_marching_cubes(volume: np.ndarray, threshold: float, **kwargs: Dict[str, Any]) -> RadMesh:
+def compute_marching_cubes(radimage: RadImage, threshold: float, **kwargs: Dict[str, Any]) -> RadMesh:
     """ Wrapper for skimage.measure.marching_cubes """
 
-    if not isinstance(volume, np.ndarray) or volume.ndim != 3:
-        raise ValueError("Input 'volume' must be a 3D numpy array.")
+    if not isinstance(radimage, RadImage) or len(radimage.shape) != 3:
+        raise ValueError("Input 'radimage' must be a 3D image.")
     
     if not isinstance(threshold, (int, float)):
         raise ValueError("Input 'threshold' must be a numeric value (int or float).")
     
     try:
-        vertices, faces, normals, values = measure.marching_cubes(volume, threshold, **kwargs)
+        vertices, faces, normals, values = measure.marching_cubes(radimage.image_data, threshold, **kwargs)
     except Exception as e:
         raise RuntimeError(f"Error encountered while computing marching cubes: {str(e)}")
     

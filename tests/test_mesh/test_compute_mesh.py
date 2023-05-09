@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from radvis.mesh import RadMesh, compute_marching_cubes
-
+from tests.mocks.mock_rad_image import MockRadImage
 
 def test_init():
     vertices = np.array([[1, 2, 3], [4, 5, 6]])
@@ -20,9 +20,11 @@ def test_init():
 def test_compute_rad_mesh_valid_input():
     volume = np.zeros((10, 10, 10))
     volume[3:7, 3:7, 3:7] = 1.0 # Create a cube of ones
+    radimage = MockRadImage()
+    radimage.image_data = volume
     threshold = 0.5
 
-    rad_mesh = compute_marching_cubes(volume, threshold)
+    rad_mesh = compute_marching_cubes(radimage, threshold)
 
     assert isinstance(rad_mesh, RadMesh)
     assert rad_mesh.vertices.shape[1] == 3
@@ -61,7 +63,9 @@ def test_rad_mesh_repr():
 
 def test_compute_rad_mesh_error_handling():
     volume = np.zeros((10, 10, 10))
+    radimage = MockRadImage()
+    radimage.image_data = volume
     threshold = 0.5
 
     with pytest.raises(RuntimeError):
-        compute_marching_cubes(volume, threshold, method="invalid_method")
+        compute_marching_cubes(radimage, threshold, method="invalid_method")
