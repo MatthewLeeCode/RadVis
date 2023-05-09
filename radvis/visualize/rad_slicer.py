@@ -53,22 +53,19 @@ class RadSlicer:
         :param initial_index: The initial slice index, defaults to 0
         :return: A slider object (either ipywidgets.IntSlider or matplotlib Slider)
         """
-        initial_slice = self.radimage.get_slice(initial_index, self.axis)
-        
         if self._notebook_environment:
-            slider_layout = Layout(width='30%')
             slider = interact(lambda val: self._update_image(val), 
                               val=IntSlider(min=0, max=self.radimage.shape[self.axis]-1, step=1, value=initial_index, 
-                                            description=f"{self.title}: Slice", layout=slider_layout))
+                                            description=f"{self.title}: Slice"))
         else:
             ax_position = ax.get_position()
-            slider_width = ax_position.width
-            slider_x = ax_position.x0
-            slider_y = ax_position.y0 - 0.1
+            slider_width = ax_position.width - 0.2
+            slider_x = ax_position.x0 + 0.1
+            slider_y = ax_position.y0 - 0.15
 
             ax_slider = plt.axes([slider_x, slider_y, slider_width, 0.03])
-            slider = Slider(ax_slider, "Slice", 0, self.radimage.shape[self.axis]-1, valstep=1, valfmt="%d",
-                                valinit=initial_slice)
+            slider = Slider(ax_slider, f"Slice", 0, self.radimage.shape[self.axis] - 1, valstep=1, valfmt="%d",
+                                valinit=initial_index)
             slider.on_changed(self._update_image)
         return slider
     
@@ -82,18 +79,19 @@ class RadSlicer:
         self._image_plot = ax.imshow(self.radimage.get_slice(initial_index, self.axis), cmap=self._cmap)
         self._slider = self._create_slider(ax, initial_index)
 
-    def display(self):
+    def display(self, ax: plt.Axes = None, initial_index: int = 0) -> None:
         """
         Display the RadSlicer plot with a slider to control the displayed slice.
         """
         if len(self.radimage.shape) != 3:
             raise ValueError("display method expects a 3D image")
 
-        self.fig, self._ax = plt.subplots()
-        self.fig.tight_layout()
-        
-        self._ax.set_title(self.title, y=0.99)
-        self.fig.set_size_inches(4, 4, forward=False)
+        if ax is None:
+            self.fig, self._ax = plt.subplots()
+            plt.subplots_adjust(bottom=0.2)
+            
+        self._ax.set_title(self.title, y=1)
+        self.fig.set_size_inches(self._figsize[0], self._figsize[1], forward=False)
         
         self._plot_image(self._ax)
         plt.show()
