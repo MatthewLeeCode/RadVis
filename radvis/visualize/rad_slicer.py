@@ -1,7 +1,9 @@
+from matplotlib.colors import ListedColormap
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 from radvis.image.rad_image import RadImage
 import numpy as np
+import numpy.ma as ma
 import IPython
 from ipywidgets import interact, IntSlider, Layout
 
@@ -21,6 +23,8 @@ class RadSlicer:
         self._title = title
         self._slider = None
         self._image_plot = None
+        self._mask_plots = []
+        self._masks = []
         self._ax = None
         self._cmap = cmap
         self._figsize = (width, height)
@@ -33,8 +37,8 @@ class RadSlicer:
         """
         if self._title is None:
             return f"Axis: {self.axis}"
-        return self._title
-    
+        return self._title    
+
     def _update_image(self, val:int) -> None:
         """
         Update the image plot with the selected slice.
@@ -43,6 +47,10 @@ class RadSlicer:
         """
         image_slice = int(val)
         self._image_plot.set_data(self.radimage.get_slice(image_slice, self.axis))
+        for plot, (mask, cmap, alpha) in zip(self._mask_plots, self._masks):
+            plot.set_data(mask[image_slice, :, :] if self.axis == 0 else
+                          mask[:, image_slice, :] if self.axis == 1 else
+                          mask[:, :, image_slice])
         self.fig.canvas.draw_idle()
 
     def _create_slider(self, ax: plt.Axes, initial_index: int = 0) -> Slider:
@@ -77,7 +85,14 @@ class RadSlicer:
         :param initial_index: The initial slice index, defaults to 0
         """
         self._image_plot = ax.imshow(self.radimage.get_slice(initial_index, self.axis), cmap=self._cmap)
+        for mask, cmap, alpha in self._masks:
+            mask_plot = ax.imshow(mask[initial_index, :, :] if self.axis == 0 else
+                      mask[:, initial_index, :] if self.axis == 1 else
+                      mask[:, :, initial_index],
+                      cmap=cmap, interpolation='none', alpha=alpha)
+            self._mask_plots.append(mask_plot)
         self._slider = self._create_slider(ax, initial_index)
+
 
     def display(self, ax: plt.Axes = None, initial_index: int = 0) -> None:
         """
@@ -95,3 +110,23 @@ class RadSlicer:
         
         self._plot_image(self._ax)
         plt.show()
+
+    def add_mask(self, mask, color='red', alpha=0.5):
+        """
+        Adds a mask to the RadSlicer.
+
+        :param mask: A 3D array that matches the shape of the radimage
+        :param color: The color of the mask
+        :param alpha: The opacity of the mask
+        """
+        if mask.shape != self.radimage.shape:
+            raise ValueError("Mask shape must match image shape")
+
+        # Create a custom colormap
+        #cmap = ListedColormap(['none', color])
+        cmap = ListedColormap([color])
+
+        # Use numpy masked array to mask the '0' values
+        mask = ma.masked_where(mask == 0, mask)
+        
+        self._masks.append((mask, cmap, alpha))
