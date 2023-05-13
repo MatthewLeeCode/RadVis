@@ -25,7 +25,7 @@ slicer = rv.RadSlicer(image, axis=0)
 
 slicer.display()
 ```
-![](images/example_0.gif)
+![](https://raw.githubusercontent.com/medlee-code/RadVis/main/images/example_0.gif?token=GHSAT0AAAAAACBJZC7OUK4KUWZ4QWBJIGJ6ZC7T4HA)
 
 Adding masks to the image
 ```python
@@ -48,7 +48,7 @@ slicer.add_mask(blue_mask, color="blue")
 
 slicer.display()
 ```
-![](images/example_mask_0.gif)
+![](https://raw.githubusercontent.com/medlee-code/RadVis/main/images/example_mask_0.gif?token=GHSAT0AAAAAACBJZC7OHBDQFXT7KM5L42NUZC7T4SQ))
 
 Mask can be another RadImage object so you can load up your masks from a DICOM or NIFTI
 ```python
@@ -70,6 +70,6 @@ slicer.display()
 ```
 
 <p float="left">
-  <img src="images/axis_1_brain_seg.gif" width="49%" /> 
-  <img src="images/axis_2_brain_seg.gif" width="49%" />
+  <img src="https://raw.githubusercontent.com/medlee-code/RadVis/main/images/axis_1_brain_seg.gif?token=GHSAT0AAAAAACBJZC7PZ2WT3CJ26PONDN2YZC7T46Q" width="49%" /> 
+  <img src="https://raw.githubusercontent.com/medlee-code/RadVis/main/images/axis_2_brain_seg.gif?token=GHSAT0AAAAAACBJZC7PDVRWL2CW2OCTUV3CZC7T5BQ" width="49%" />
 </p>
