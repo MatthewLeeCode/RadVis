@@ -1,15 +1,11 @@
-import sys
-sys.path.append("../../")
-
 import radvis as rv
 import numpy as np
 
-IMAGE_PATH = "../images/test_nifti.nii.gz"
+image = rv.load_image('examples/images/sub-A00028185_ses-NFB3_T1w.nii.gz')
 
-image = rv.load_image(IMAGE_PATH)
+slicer = rv.RadSlicer(image, axis=0)
 
-slicer = rv.RadSlicer(image, 2)
-
+# 0 values wont be displayed
 red_mask = np.zeros_like(image.image_data) 
 red_mask[5:100, 5:100, 5:100] = 1
 
@@ -19,4 +15,4 @@ blue_mask[70:150, 70:150, 70:150] = 1
 slicer.add_mask(red_mask, color="red")
 slicer.add_mask(blue_mask, color="blue")
 
-slicer.display()
+slicer.save_animation("images/example_mask_0.gif", fps=30)

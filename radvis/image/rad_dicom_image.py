@@ -2,6 +2,7 @@ from .rad_image import RadImage
 import pydicom
 import os
 from typing import Optional
+import numpy as np
 
 
 class RadDicomImage(RadImage):
@@ -22,7 +23,7 @@ class RadDicomImage(RadImage):
             raise FileNotFoundError(f"File not found: {self.file_path}")
 
         self.data = pydicom.dcmread(self.file_path)
-        self.image_data = self.data.pixel_array
+        self.image_data = np.array(self.data.pixel_array, dtype=np.float32)
         self.metadata = self.data.file_meta
 
     def save(self, output_file_path: str) -> None:

@@ -1,3 +1,4 @@
+from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib.colors import ListedColormap
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
@@ -47,7 +48,7 @@ class RadSlicer:
         """
         image_slice = int(val)
         self._image_plot.set_data(self.radimage.get_slice(image_slice, self.axis))
-        for plot, (mask, cmap, alpha) in zip(self._mask_plots, self._masks):
+        for plot, (mask, _, _) in zip(self._mask_plots, self._masks):
             plot.set_data(mask[image_slice, :, :] if self.axis == 0 else
                           mask[:, image_slice, :] if self.axis == 1 else
                           mask[:, :, image_slice])
@@ -84,12 +85,19 @@ class RadSlicer:
         :param ax: The plt.Axes object to plot the image on
         :param initial_index: The initial slice index, defaults to 0
         """
-        self._image_plot = ax.imshow(self.radimage.get_slice(initial_index, self.axis), cmap=self._cmap)
+        self._image_plot = ax.imshow(
+            self.radimage.get_slice(initial_index, self.axis), 
+            cmap=self._cmap,
+            vmin=self.radimage.image_data.min(),
+            vmax=self.radimage.image_data.max(),
+            interpolation='none'
+        )
         for mask, cmap, alpha in self._masks:
             mask_plot = ax.imshow(mask[initial_index, :, :] if self.axis == 0 else
                       mask[:, initial_index, :] if self.axis == 1 else
                       mask[:, :, initial_index],
-                      cmap=cmap, interpolation='none', alpha=alpha)
+                      cmap=cmap, interpolation='none', alpha=alpha,
+                      vmin=0, vmax=1)
             self._mask_plots.append(mask_plot)
         self._slider = self._create_slider(ax, initial_index)
 
@@ -108,10 +116,10 @@ class RadSlicer:
         self._ax.set_title(self.title, y=1)
         self.fig.set_size_inches(self._figsize[0], self._figsize[1], forward=False)
         
-        self._plot_image(self._ax)
+        self._plot_image(self._ax, initial_index)
         plt.show()
 
-    def add_mask(self, mask, color='red', alpha=0.5):
+    def add_mask(self, mask: np.ndarray | RadImage, color: str = 'red', alpha: float = 0.5):
         """
         Adds a mask to the RadSlicer.
 
@@ -119,14 +127,36 @@ class RadSlicer:
         :param color: The color of the mask
         :param alpha: The opacity of the mask
         """
+        if not isinstance(mask, np.ndarray) and not isinstance(mask, RadImage):
+            raise ValueError("Mask must be a numpy array or RadImage object")
+        
+        if isinstance(mask, RadImage):
+            mask = mask.image_data
+        
         if mask.shape != self.radimage.shape:
             raise ValueError("Mask shape must match image shape")
 
-        # Create a custom colormap
-        #cmap = ListedColormap(['none', color])
         cmap = ListedColormap([color])
-
-        # Use numpy masked array to mask the '0' values
         mask = ma.masked_where(mask == 0, mask)
         
         self._masks.append((mask, cmap, alpha))
+    
+    def save_animation(self, filepath: str, fps: int = 10) -> None:
+        """
+        Save an animation of all slices to a GIF file.
+
+        :param filepath: The path to save the animation to
+        :param fps: The frames per second for the animation, defaults to 10
+        """
+        # Ensure display has been called at least once
+        if self._ax is None:
+            self.display()
+
+        # Create the animation
+        anim = FuncAnimation(self.fig, self._update_image, frames=self.radimage.shape[self.axis], interval=1000//fps)
+
+        try:
+            anim.save(filepath, writer=PillowWriter(fps=fps))
+        except Exception as e:
+            print(f"Could not save the animation due to the following error: {e}")
+    
