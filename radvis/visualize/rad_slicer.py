@@ -1,6 +1,7 @@
 import copy
+import matplotlib.cm as cm
 from matplotlib.animation import FuncAnimation, PillowWriter
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import Colormap, ListedColormap
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 from radvis.image.rad_image import RadImage
@@ -147,7 +148,7 @@ class RadSlicer:
                       mask[:, initial_index, :] if self.axis == 1 else
                       mask[:, :, initial_index],
                       cmap=cmap, interpolation='none', alpha=alpha,
-                      vmin=0, vmax=1)
+                      vmin=0, vmax=mask.max())
             self._mask_plots.append(mask_plot)
         self._slider = self._create_slider(ax, initial_index)
 
@@ -174,7 +175,7 @@ class RadSlicer:
         if show_plot:
             plt.show()
 
-    def add_mask(self, mask: np.ndarray | RadImage, color: str = 'red', alpha: float = 0.5):
+    def add_mask(self, mask: np.ndarray | RadImage, color: str | Colormap = 'red', alpha: float = 0.5):
         """
         Adds a mask to the RadSlicer.
 
@@ -190,8 +191,17 @@ class RadSlicer:
         
         if mask.shape != self.radimage.shape:
             raise ValueError("Mask shape must match image shape")
-
-        cmap = ListedColormap([color])
+        
+        if isinstance(color, str):
+            if color in plt.colormaps():
+                cmap = cm.get_cmap(color)
+            else:
+                cmap = ListedColormap([color])
+        elif isinstance(color, Colormap):
+            cmap = color
+        else:
+            raise ValueError("Color must be a string or a Colormap object")
+        
         mask = ma.masked_where(mask == 0, mask)
         
         self._masks.append((mask, cmap, alpha))

@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 .vscode/settings.json
 examples/images/*
+examples/notebooks/miccai_2012_grand_atlas_labelling.ipynb

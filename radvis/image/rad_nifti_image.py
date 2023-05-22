@@ -3,7 +3,7 @@ import nibabel as nib
 import os
 from typing import Optional
 import numpy as np
-
+nib.Nifti1Header.quaternion_threshold = -1e-06
 
 class RadNiftiImage(RadImage):
     def __init__(self, file_path: Optional[str] = None):
@@ -35,5 +35,5 @@ class RadNiftiImage(RadImage):
         if self.image_data is None:
             raise ValueError("No image data to save.")
 
-        nifti_data = nifti_data = nib.Nifti1Image(self.image_data, affine=np.eye(4))
+        nifti_data = nib.Nifti1Image(self.image_data, affine=np.eye(4))
         nib.save(nifti_data, output_file_path)
