@@ -1,3 +1,4 @@
+import copy
 from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib.colors import ListedColormap
 import matplotlib.pyplot as plt
@@ -41,6 +42,27 @@ class RadSlicer:
         if self._title is None:
             return f"Axis: {self.axis}"
         return self._title    
+
+    @property
+    def width(self):
+        """
+        Returns the width of the figure.
+        """
+        return self._figsize[0]
+    
+    @property
+    def height(self):
+        """
+        Returns the height of the figure.
+        """
+        return self._figsize[1]
+    
+    @property
+    def figsize(self):
+        """
+        Returns the figure size.
+        """
+        return self._figsize
 
     def remove_slider(self) -> None:
         """
@@ -130,7 +152,7 @@ class RadSlicer:
         self._slider = self._create_slider(ax, initial_index)
 
 
-    def display(self, ax: plt.Axes = None, initial_index: int = 0) -> None:
+    def display(self, ax: plt.Axes = None, initial_index: int = 0, show_plot=True) -> None:
         """
         Display the RadSlicer plot with a slider to control the displayed slice.
         """
@@ -140,12 +162,17 @@ class RadSlicer:
         if ax is None:
             self.fig, self._ax = plt.subplots()
             plt.subplots_adjust(bottom=0.2)
-            
+        else:
+            self._ax = ax
+            self.fig = ax.get_figure()
+               
         self._ax.set_title(self.title, y=1)
         self.fig.set_size_inches(self._figsize[0], self._figsize[1], forward=False)
         
         self._plot_image(self._ax, initial_index)
-        plt.show()
+        
+        if show_plot:
+            plt.show()
 
     def add_mask(self, mask: np.ndarray | RadImage, color: str = 'red', alpha: float = 0.5):
         """
@@ -187,4 +214,10 @@ class RadSlicer:
             anim.save(filepath, writer=PillowWriter(fps=fps))
         except Exception as e:
             print(f"Could not save the animation due to the following error: {e}")
+            
+    def copy(self):
+        """
+        Create a copy of the RadSlicer object.
+        """
+        return copy.deepcopy(self)
     
