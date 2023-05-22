@@ -23,7 +23,7 @@ class RadNiftiImage(RadImage):
             raise FileNotFoundError(f"File not found: {self.file_path}")
 
         self.data = nib.load(self.file_path)
-        self.image_data = np.asanyarray(self.data.dataobj)
+        self.image_data = np.asanyarray(self.data.dataobj, dtype=np.float32)
         self.metadata = self.data.header
 
     def save(self, output_file_path: str) -> None:
