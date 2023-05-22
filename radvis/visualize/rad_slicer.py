@@ -31,7 +31,8 @@ class RadSlicer:
         self._cmap = cmap
         self._figsize = (width, height)
         self._notebook_environment = IPython.get_ipython().__class__.__name__ == 'ZMQInteractiveShell'
-
+        self._slider_coords = None
+        
     @property
     def title(self):
         """
@@ -41,6 +42,25 @@ class RadSlicer:
             return f"Axis: {self.axis}"
         return self._title    
 
+    def remove_slider(self) -> None:
+        """
+        Remove the slider from the plot.
+        """
+        self._show_slider = False
+        del self._slider
+        self._slider = None
+    
+    def set_slider_coordinates(self, x:float, y:float, width:float, height:float) -> None:
+        """
+        Set the coordinates of the slider.
+
+        :param x: The x-coordinate of the slider
+        :param y: The y-coordinate of the slider
+        :param width: The width of the slider
+        :param height: The height of the slider
+        """
+        self._slider_coords = [x, y, width, height]
+    
     def _update_image(self, val:int) -> None:
         """
         Update the image plot with the selected slice.
@@ -73,10 +93,14 @@ class RadSlicer:
         else:
             ax_position = ax.get_position()
             slider_width = ax_position.width - 0.2
+            slider_height = 0.03
             slider_x = ax_position.x0 + 0.1
             slider_y = ax_position.y0 - 0.15
-
-            ax_slider = plt.axes([slider_x, slider_y, slider_width, 0.03])
+            
+            if self._slider_coords is not None:
+                slider_x, slider_y, slider_width, slider_height = self._slider_coords
+                
+            ax_slider = plt.axes([slider_x, slider_y, slider_width, slider_height])
             slider = Slider(ax_slider, f"Slice", 0, self.radimage.shape[self.axis] - 1, valstep=1, valfmt="%d",
                                 valinit=initial_index)
             slider.on_changed(self._update_image)
