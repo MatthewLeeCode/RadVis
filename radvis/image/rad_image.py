@@ -88,6 +88,16 @@ class RadImage(ABC):
         slice_2d = data[index]
 
         return slice_2d
+    
+    def copy(self):
+        """ 
+        Return a copy of the image.
+        """
+        new_image = self.__class__(self.file_path)
+        new_image.data = self.data
+        new_image.image_data = np.copy(self.image_data)
+        new_image.metadata = self.metadata.copy() if self.metadata else None
+        return new_image
 
     def __recv__(self) -> str:
         """
