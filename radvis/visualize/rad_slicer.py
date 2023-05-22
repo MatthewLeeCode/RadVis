@@ -11,7 +11,7 @@ from ipywidgets import interact, IntSlider, Layout
 
 class RadSlicer:
     def __init__(self, radimage: RadImage, axis: int = 0, title=None, cmap: str = "gray",
-                 width=4, height=4) -> None:
+                 width:int=4, height:int=4, show_slider:bool = True) -> None:
         """
         Initialize the RadSlicer class.
 
@@ -23,6 +23,7 @@ class RadSlicer:
         self.axis = axis
         self._title = title
         self._slider = None
+        self._show_slider = show_slider
         self._image_plot = None
         self._mask_plots = []
         self._masks = []
@@ -54,14 +55,17 @@ class RadSlicer:
                           mask[:, :, image_slice])
         self.fig.canvas.draw_idle()
 
-    def _create_slider(self, ax: plt.Axes, initial_index: int = 0) -> Slider:
+    def _create_slider(self, ax: plt.Axes, initial_index: int = 0) -> Slider|None:
         """
         Create a slider for the given plt.Axes object.
 
         :param ax: The plt.Axes object to add the slider to
         :param initial_index: The initial slice index, defaults to 0
-        :return: A slider object (either ipywidgets.IntSlider or matplotlib Slider)
+        :return: A slider object (either ipywidgets.IntSlider or matplotlib Slider) or None
         """
+        if self._show_slider is False:
+            return None
+        
         if self._notebook_environment:
             slider = interact(lambda val: self._update_image(val), 
                               val=IntSlider(min=0, max=self.radimage.shape[self.axis]-1, step=1, value=initial_index, 
