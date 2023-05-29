@@ -7,8 +7,11 @@ from matplotlib.widgets import Slider
 from radvis.image.rad_image import RadImage
 import numpy as np
 import numpy.ma as ma
-import IPython
-from ipywidgets import interact, IntSlider, Layout
+try:
+    import IPython
+    from ipywidgets import interact, IntSlider
+except ImportError:
+    print("Warning: ipywidgets not installed. RadSlicer will not work in Jupyter Notebook.")
 
 
 class RadSlicer:

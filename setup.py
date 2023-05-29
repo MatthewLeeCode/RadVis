@@ -14,13 +14,10 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(),
     install_requires=[
-        'pytest==7.3.1',
-        'meshio==5.3.4',
         'scikit-image==0.20.0',
         'pydicom==2.3.1',
         'nibabel==5.1.0',
-        'matplotlib==3.7.1',
-        'jupyter==1.0.0'
+        'matplotlib==3.7.1'
     ],
     python_requires='>=3.10',
 )
