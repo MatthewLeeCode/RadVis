@@ -48,7 +48,7 @@ slicer.add_mask(blue_mask, color="blue")
 
 slicer.display()
 ```
-![](https://raw.githubusercontent.com/medlee-code/RadVis/main/images/example_mask_0.gif?token=GHSAT0AAAAAACBJZC7OHBDQFXT7KM5L42NUZC7T4SQ))
+![](https://raw.githubusercontent.com/medlee-code/RadVis/main/images/example_mask_0.gif?token=GHSAT0AAAAAACBJZC7OHBDQFXT7KM5L42NUZC7T4SQ)
 
 Mask can be another RadImage object so you can load up your masks from a DICOM or NIFTI
 ```python
