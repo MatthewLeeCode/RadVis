@@ -80,14 +80,21 @@ class RadImage(ABC):
         # Checks that the index is within the bounds of the image data
         if index < 0 or index >= self.image_data.shape[axis]:
             raise ValueError(f"Index {index} is out of bounds for axis {axis}")
-        
-        # Swap the desired axis with the first axis
-        data = np.swapaxes(self.image_data, 0, axis)
 
-        # Select the slice along the first axis
-        slice_2d = data[index]
-
-        return slice_2d
+        # Slice along the appropriate axis
+        slicer = [slice(None)] * self.image_data.ndim
+        slicer[axis] = index
+        return self.image_data[tuple(slicer)]
+    
+    def copy(self):
+        """ 
+        Return a copy of the image.
+        """
+        new_image = self.__class__(self.file_path)
+        new_image.data = self.data
+        new_image.image_data = np.copy(self.image_data)
+        new_image.metadata = self.metadata.copy() if self.metadata else None
+        return new_image
 
     def __recv__(self) -> str:
         """

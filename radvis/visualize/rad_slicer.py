@@ -1,5 +1,7 @@
+import copy
+import matplotlib.cm as cm
 from matplotlib.animation import FuncAnimation, PillowWriter
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import Colormap, ListedColormap
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 from radvis.image.rad_image import RadImage
@@ -11,7 +13,7 @@ from ipywidgets import interact, IntSlider, Layout
 
 class RadSlicer:
     def __init__(self, radimage: RadImage, axis: int = 0, title=None, cmap: str = "gray",
-                 width=4, height=4) -> None:
+                 width:int=4, height:int=4, show_slider:bool = True) -> None:
         """
         Initialize the RadSlicer class.
 
@@ -23,6 +25,7 @@ class RadSlicer:
         self.axis = axis
         self._title = title
         self._slider = None
+        self._show_slider = show_slider
         self._image_plot = None
         self._mask_plots = []
         self._masks = []
@@ -30,7 +33,8 @@ class RadSlicer:
         self._cmap = cmap
         self._figsize = (width, height)
         self._notebook_environment = IPython.get_ipython().__class__.__name__ == 'ZMQInteractiveShell'
-
+        self._slider_coords = None
+        
     @property
     def title(self):
         """
@@ -40,6 +44,46 @@ class RadSlicer:
             return f"Axis: {self.axis}"
         return self._title    
 
+    @property
+    def width(self):
+        """
+        Returns the width of the figure.
+        """
+        return self._figsize[0]
+    
+    @property
+    def height(self):
+        """
+        Returns the height of the figure.
+        """
+        return self._figsize[1]
+    
+    @property
+    def figsize(self):
+        """
+        Returns the figure size.
+        """
+        return self._figsize
+
+    def remove_slider(self) -> None:
+        """
+        Remove the slider from the plot.
+        """
+        self._show_slider = False
+        del self._slider
+        self._slider = None
+    
+    def set_slider_coordinates(self, x:float, y:float, width:float, height:float) -> None:
+        """
+        Set the coordinates of the slider.
+
+        :param x: The x-coordinate of the slider
+        :param y: The y-coordinate of the slider
+        :param width: The width of the slider
+        :param height: The height of the slider
+        """
+        self._slider_coords = [x, y, width, height]
+    
     def _update_image(self, val:int) -> None:
         """
         Update the image plot with the selected slice.
@@ -54,14 +98,17 @@ class RadSlicer:
                           mask[:, :, image_slice])
         self.fig.canvas.draw_idle()
 
-    def _create_slider(self, ax: plt.Axes, initial_index: int = 0) -> Slider:
+    def _create_slider(self, ax: plt.Axes, initial_index: int = 0) -> Slider|None:
         """
         Create a slider for the given plt.Axes object.
 
         :param ax: The plt.Axes object to add the slider to
         :param initial_index: The initial slice index, defaults to 0
-        :return: A slider object (either ipywidgets.IntSlider or matplotlib Slider)
+        :return: A slider object (either ipywidgets.IntSlider or matplotlib Slider) or None
         """
+        if self._show_slider is False:
+            return None
+        
         if self._notebook_environment:
             slider = interact(lambda val: self._update_image(val), 
                               val=IntSlider(min=0, max=self.radimage.shape[self.axis]-1, step=1, value=initial_index, 
@@ -69,10 +116,14 @@ class RadSlicer:
         else:
             ax_position = ax.get_position()
             slider_width = ax_position.width - 0.2
+            slider_height = 0.03
             slider_x = ax_position.x0 + 0.1
             slider_y = ax_position.y0 - 0.15
-
-            ax_slider = plt.axes([slider_x, slider_y, slider_width, 0.03])
+            
+            if self._slider_coords is not None:
+                slider_x, slider_y, slider_width, slider_height = self._slider_coords
+                
+            ax_slider = plt.axes([slider_x, slider_y, slider_width, slider_height])
             slider = Slider(ax_slider, f"Slice", 0, self.radimage.shape[self.axis] - 1, valstep=1, valfmt="%d",
                                 valinit=initial_index)
             slider.on_changed(self._update_image)
@@ -97,12 +148,12 @@ class RadSlicer:
                       mask[:, initial_index, :] if self.axis == 1 else
                       mask[:, :, initial_index],
                       cmap=cmap, interpolation='none', alpha=alpha,
-                      vmin=0, vmax=1)
+                      vmin=0, vmax=mask.max())
             self._mask_plots.append(mask_plot)
         self._slider = self._create_slider(ax, initial_index)
 
 
-    def display(self, ax: plt.Axes = None, initial_index: int = 0) -> None:
+    def display(self, ax: plt.Axes = None, initial_index: int = 0, show_plot=True) -> None:
         """
         Display the RadSlicer plot with a slider to control the displayed slice.
         """
@@ -112,14 +163,19 @@ class RadSlicer:
         if ax is None:
             self.fig, self._ax = plt.subplots()
             plt.subplots_adjust(bottom=0.2)
-            
+        else:
+            self._ax = ax
+            self.fig = ax.get_figure()
+               
         self._ax.set_title(self.title, y=1)
         self.fig.set_size_inches(self._figsize[0], self._figsize[1], forward=False)
         
         self._plot_image(self._ax, initial_index)
-        plt.show()
+        
+        if show_plot:
+            plt.show()
 
-    def add_mask(self, mask: np.ndarray | RadImage, color: str = 'red', alpha: float = 0.5):
+    def add_mask(self, mask: np.ndarray | RadImage, color: str | Colormap = 'red', alpha: float = 0.5):
         """
         Adds a mask to the RadSlicer.
 
@@ -135,8 +191,17 @@ class RadSlicer:
         
         if mask.shape != self.radimage.shape:
             raise ValueError("Mask shape must match image shape")
-
-        cmap = ListedColormap([color])
+        
+        if isinstance(color, str):
+            if color in plt.colormaps():
+                cmap = cm.get_cmap(color)
+            else:
+                cmap = ListedColormap([color])
+        elif isinstance(color, Colormap):
+            cmap = color
+        else:
+            raise ValueError("Color must be a string or a Colormap object")
+        
         mask = ma.masked_where(mask == 0, mask)
         
         self._masks.append((mask, cmap, alpha))
@@ -159,4 +224,10 @@ class RadSlicer:
             anim.save(filepath, writer=PillowWriter(fps=fps))
         except Exception as e:
             print(f"Could not save the animation due to the following error: {e}")
+            
+    def copy(self):
+        """
+        Create a copy of the RadSlicer object.
+        """
+        return copy.deepcopy(self)
     
