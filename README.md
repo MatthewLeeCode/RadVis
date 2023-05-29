@@ -1,8 +1,6 @@
 # RadVis
 RadVis (Radiology Visualization) is a visualization tool for medical images.
 
-> Work in progress
-
 Currently implemented features:
 - Load both DICOM and NIFTI images
 - Can display 2D slices of the 3D images
@@ -12,7 +10,7 @@ Currently implemented features:
 ## Installation
 `pip install radvis`
 
-## Usage
+## RadSlice Viewer
 
 Loading an image and displaying it with a slider
 ```python
@@ -73,3 +71,39 @@ slicer.display()
   <img src="https://raw.githubusercontent.com/medlee-code/RadVis/main/images/axis_1_brain_seg.gif?token=GHSAT0AAAAAACBJZC7PZ2WT3CJ26PONDN2YZC7T46Q" width="49%" /> 
   <img src="https://raw.githubusercontent.com/medlee-code/RadVis/main/images/axis_2_brain_seg.gif?token=GHSAT0AAAAAACBJZC7PDVRWL2CW2OCTUV3CZC7T5BQ" width="49%" />
 </p>
+
+## Processing Module
+
+The processing module of RadVis offers a set of functions to perform preprocessing tasks
+
+### Clipping
+The `percentile_clipping` function allows you to clip the pixel intensities of an image at specified lower and upper percentiles. This can be helpful in enhancing the contrast of the image.
+
+### Noise Reduction
+The `noise_reduction` function can be used to reduce the amount of noise in your images, which is particularly useful for medical images where noise can often interfere with the analysis.
+
+### Normalization
+The `normalization` function is used to normalize the pixel intensities of the image to a specified range. This is useful for preparing your images for machine learning models, which often perform better when the input data is normalized.
+
+### Padding
+The `add_padding` function can be used to add padding to your images, which can be useful when you need to make all your images the same size for subsequent analysis or to apply a neural network that requires input images to be of a certain size.
+
+Example usage of processing functions:
+
+```python
+import radvis as rv
+import numpy as np
+
+# Loading image
+image = rv.load_image(filepath='path/to/image.nii.gz')
+
+# Applying processing functions
+clipped_image = rv.processing.percentile_clipping(image, lower_percentile=0.25, upper_percentile=0.75)
+filtered_image = rv.processing.noise_reduction(clipped_image, filter_size=1)
+normalized_image = rv.processing.normalization(filtered_image, min_val=0, max_val=255)
+padded_image = rv.processing.add_padding(normalized_image, target_shape=(128, 128, 128))
+
+# Displaying processed image
+slicer = rv.RadSlicer(padded_image, axis=0)
+slicer.display()
+```

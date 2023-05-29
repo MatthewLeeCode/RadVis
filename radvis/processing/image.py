@@ -64,12 +64,12 @@ def percentile_clipping(rad_image: RadImage, lower_percentile: float, upper_perc
     return new_rad_image
 
 
-def add_padding(rad_image: RadImage, expected_shape: tuple) -> RadImage:
+def add_padding(rad_image: RadImage, target_shape: tuple) -> RadImage:
     """
     Adds padding to either side of the image to match the expected shape.
 
     :param rad_image: The RadImage object to be padded.
-    :param expected_shape: The expected shape of the image.
+    :param target_shape: The expected shape of the image.
 
     :return: The RadImage object with padding added.
     """
@@ -78,7 +78,7 @@ def add_padding(rad_image: RadImage, expected_shape: tuple) -> RadImage:
         raise ValueError("Image data not loaded")
 
     # Compute the padding
-    padding = np.subtract(expected_shape, new_rad_image.image_data.shape)
+    padding = np.subtract(target_shape, new_rad_image.image_data.shape)
     padding = np.array([padding // 2, padding - padding // 2]).T
 
     # Pad the image data
