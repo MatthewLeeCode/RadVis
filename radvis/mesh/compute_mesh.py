@@ -13,7 +13,6 @@ Returns:
         normals: A numpy array of shape (n, 3) containing the normals of the mesh.
         values: A numpy array of shape (n,) containing the values of the mesh.
 """
-import numpy as np
 from skimage import measure
 from typing import Any, Dict
 from .rad_mesh import RadMesh    

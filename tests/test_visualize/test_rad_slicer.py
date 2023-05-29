@@ -1,8 +1,5 @@
 import numpy as np
 import pytest
-import matplotlib.pyplot as plt
-import unittest
-from unittest.mock import MagicMock
 from radvis.visualize.rad_slicer import RadSlicer
 from tests.mocks.mock_rad_image import MockRadImage 
 

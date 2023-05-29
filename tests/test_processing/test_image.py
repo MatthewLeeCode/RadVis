@@ -1,5 +1,5 @@
 import numpy as np
-from radvis.processing.filtering import percentile_clipping, noise_reduction, normalization, add_padding
+from radvis.processing.image import percentile_clipping, noise_reduction, normalization, add_padding
 from tests.mocks.mock_rad_image import MockRadImage 
 
 def test_clipping():
