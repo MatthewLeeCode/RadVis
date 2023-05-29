@@ -12,8 +12,8 @@ class RadImage(ABC):
         """
         self.file_path = file_path
         self.data = None
-        self.image_data: Optional[np.ndarray] = None
-        self.metadata = None
+        self.image_data: np.ndarray = np.array([])
+        self.metadata:dict = {}
         if self.file_path:
             self.load()
 
@@ -22,8 +22,6 @@ class RadImage(ABC):
         """
         Return the shape of the image data.
         """
-        if self.image_data is None:
-            return None
         return self.image_data.shape
 
     @abstractmethod
@@ -86,14 +84,17 @@ class RadImage(ABC):
         slicer[axis] = index
         return self.image_data[tuple(slicer)]
     
-    def copy(self):
+    def copy(self) -> 'RadImage':
         """ 
         Return a copy of the image.
         """
         new_image = self.__class__(self.file_path)
         new_image.data = self.data
-        new_image.image_data = np.copy(self.image_data)
-        new_image.metadata = self.metadata.copy() if self.metadata else None
+
+        if self.image_data is not None:
+            new_image.image_data = np.copy(self.image_data)
+
+        new_image.metadata = self.metadata.copy()
         return new_image
 
     def __recv__(self) -> str:
@@ -102,8 +103,11 @@ class RadImage(ABC):
         """
         return self.get_image_info()
     
-    def __getitem__(self, value:list) -> np.ndarray:
+    def __getitem__(self, value:list) -> Optional[np.ndarray]:
         """
         Return the image data at the given index.
         """
-        return self.image_data[value]
+        if self.image_data is not None:
+            return self.image_data[value]
+        else:
+            return None
