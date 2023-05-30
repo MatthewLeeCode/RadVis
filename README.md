@@ -77,16 +77,16 @@ slicer.display()
 The processing module of RadVis offers a set of functions to perform preprocessing tasks
 
 ### Clipping
-The `percentile_clipping` function allows you to clip the pixel intensities of an image at specified lower and upper percentiles. This can be helpful in enhancing the contrast of the image.
+The `percentile_clipping` function clips pixel intensities above and below percentile ranges
 
 ### Noise Reduction
-The `noise_reduction` function can be used to reduce the amount of noise in your images, which is particularly useful for medical images where noise can often interfere with the analysis.
+The `noise_reduction` function reduces the amount of noise in the image
 
 ### Normalization
-The `normalization` function is used to normalize the pixel intensities of the image to a specified range. This is useful for preparing your images for machine learning models, which often perform better when the input data is normalized.
+The `normalization` function normalizes the pixel intensities of the image to a specified range.
 
 ### Padding
-The `add_padding` function can be used to add padding to your images, which can be useful when you need to make all your images the same size for subsequent analysis or to apply a neural network that requires input images to be of a certain size.
+The `add_padding` function adds padding evenly to match a target shape
 
 Example usage of processing functions:
 
