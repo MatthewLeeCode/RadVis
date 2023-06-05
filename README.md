@@ -64,7 +64,8 @@ slicer = rv.RadSlicer(image, AXIS, width=3)
 slicer.add_mask(mask, color="red", alpha=0.3)
 
 slicer.display()
-# slicer.save_animation(f"images/axis_{AXIS}_brain_seg.gif", fps=30)
+slicer.save_animation(f"images/axis_{AXIS}_brain_seg.gif", fps=30)
+slicer.save_frame(f"images/axis_{AXIS}_brain_seg.png", index=180, dpi=300)
 ```
 
 <p float="left">

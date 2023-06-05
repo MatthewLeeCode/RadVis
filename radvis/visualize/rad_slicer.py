@@ -218,7 +218,7 @@ class RadSlicer:
         """
         # Ensure display has been called at least once
         if self._ax is None:
-            self.display()
+            self.display(show_plot=False)
 
         # Create the animation
         anim = FuncAnimation(self.fig, self._update_image, frames=self.radimage.shape[self.axis], interval=1000//fps)
@@ -227,6 +227,22 @@ class RadSlicer:
             anim.save(filepath, writer=PillowWriter(fps=fps))
         except Exception as e:
             print(f"Could not save the animation due to the following error: {e}")
+
+    def save_frame(self, filepath: str, index: int = 0, dpi: int = 72) -> None:
+        """
+        Save a single frame of the RadSlicer plot to a PNG file.
+
+        :param filepath: The path to save the frame to
+        :param index: The slice index to save, defaults to 0
+        """
+        # Ensure display has been called at least once
+        if self._ax is None:
+            self.display(show_plot=False)
+
+        # Save the frame
+        self._update_image(index)
+
+        self.fig.savefig(filepath, dpi=dpi)
             
     def copy(self):
         """
