@@ -1,3 +1,4 @@
-from .load import load_image, RadImage
+from .instantiate import load_image, from_numpy
+from .rad_image import RadImage
 
-__all__ = ["load_image", "RadImage"]
+__all__ = ["load_image", "RadImage", "from_numpy"]

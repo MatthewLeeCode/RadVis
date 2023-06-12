@@ -17,13 +17,31 @@ Loading an image and displaying it with a slider
 import radvis as rv
 
 # Creates a 'RadImage' object containing the image data
-image = rv.load_image('path/to/image.nii.gz')
+image = rv.load_image('path/to/image.nii.gz') # Can also load from DICOM or Numpy files
 
 slicer = rv.RadSlicer(image, axis=0)
 
 slicer.display()
 ```
 ![](https://raw.githubusercontent.com/medlee-code/RadVis/main/images/example_0.gif?token=GHSAT0AAAAAACBJZC7OUK4KUWZ4QWBJIGJ6ZC7T4HA)
+
+
+Create a `RadImage` from a numpy array
+```python
+import radvis as rv
+import numpy as np
+
+# Creating a numpy array
+image_data = np.random.rand(100, 100, 100)
+
+# Creating a 'RadImage' object from the numpy array
+image = rv.from_numpy(image_data)
+
+slicer = rv.RadSlicer(image, axis=0)
+
+slicer.display()
+```
+
 
 Adding masks to the image
 ```python

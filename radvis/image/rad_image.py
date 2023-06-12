@@ -59,6 +59,20 @@ class RadImage(ABC):
                 header_str += f"{key}: {value}\n"
 
         return f"{shape_str}\n{header_str}"
+    
+    def get_image_data(self) -> np.ndarray:
+        """
+        Return the image data.
+        """
+        return self.image_data
+
+    def set_image_data(self, image_data: np.ndarray) -> None:
+        """
+        Set the image data.
+
+        :param image_data: The image data to set
+        """
+        self.image_data = image_data
 
     def get_slice(self, index: int, axis: int = 0) -> np.ndarray:
         """
