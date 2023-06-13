@@ -1,5 +1,5 @@
 import numpy as np
-from radvis.processing.image import percentile_clipping, noise_reduction, normalization, add_padding
+from radvis.processing.image import percentile_clipping, noise_reduction, normalization, add_padding, apply_mask
 from tests.mocks.mock_rad_image import MockRadImage 
 
 def test_clipping():
@@ -36,3 +36,32 @@ def test_add_padding():
     # Check that the shape matches the expected shape
     assert padded_image.image_data.shape == expected_shape
 
+def test_apply_mask():
+    # Create a mock image with a diagonal line of 1s
+    image_data = np.zeros((10, 10))
+    np.fill_diagonal(image_data, 1)
+    rad_image = MockRadImage().load(image_data=image_data)
+
+    # Create a mask that selects the diagonal line
+    mask = np.eye(10)
+
+    # Apply the mask to the image
+    masked_image = apply_mask(rad_image, mask)
+
+    # Check that the masked image only has values on the diagonal line
+    assert np.array_equal(masked_image.image_data, np.eye(10))
+
+def test_apply_mask_invert():
+    # Create a mock image with a diagonal line of 1s
+    image_data = np.zeros((10, 10))
+    np.fill_diagonal(image_data, 1)
+    rad_image = MockRadImage().load(image_data=image_data)
+
+    # Create a mask that selects everything except the diagonal line
+    mask = np.ones((10, 10)) - np.eye(10)
+
+    # Apply the inverted mask to the image
+    masked_image = apply_mask(rad_image, mask, invert=True)
+
+    # Check that the masked image only has values off the diagonal line
+    assert np.array_equal(masked_image.image_data, np.ones((10, 10)) - np.eye(10))

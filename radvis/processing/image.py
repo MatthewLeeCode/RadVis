@@ -84,3 +84,31 @@ def add_padding(rad_image: RadImage, target_shape: tuple) -> RadImage:
     # Pad the image data
     new_rad_image.image_data = np.pad(new_rad_image.image_data, padding, mode='constant')
     return new_rad_image
+
+
+def apply_mask(rad_image: RadImage, mask: np.ndarray|RadImage, invert=False) -> RadImage:
+    """
+    Apply a mask to a given RadImage.
+
+    :param rad_image: The RadImage object to be masked.
+    :param mask: The mask to be applied to the RadImage.
+    :param invert: Whether to invert the mask.
+
+    :return: The RadImage object with the mask applied.
+
+    :raises ValueError: If image data is not loaded.
+    """
+    new_rad_image = rad_image.copy()
+    if new_rad_image.image_data is None:
+        raise ValueError("Image data not loaded")
+
+    # Check if the mask is a RadImage
+    if isinstance(mask, RadImage):
+        mask = mask.image_data
+
+    # Apply the mask
+    if invert:
+        new_rad_image.image_data = np.where(mask, new_rad_image.image_data, 0)
+    else:
+        new_rad_image.image_data = np.where(mask, 0, new_rad_image.image_data)
+    return new_rad_image
