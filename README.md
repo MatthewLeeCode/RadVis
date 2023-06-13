@@ -1,10 +1,10 @@
-# RadVis
-RadVis (Radiology Visualization) is a visualization tool for medical images. 
+# 🤙 RadVis
+ 🌴 RadVis (Radiology Visualization) is a simple visualization package for medical imaging 🌴
 
-## Installation
+## 🌊 Installation
 `pip install radvis`
 
-## RadSlice Viewer
+## 🛹 RadSlice Viewer
 
 Loading an image and displaying it with a slider
 ```python
@@ -85,7 +85,7 @@ slicer.save_frame(f"images/axis_{AXIS}_brain_seg.png", index=180, dpi=300)
   <img src="https://raw.githubusercontent.com/medlee-code/RadVis/main/images/axis_2_brain_seg.gif?token=GHSAT0AAAAAACBJZC7PDVRWL2CW2OCTUV3CZC7T5BQ" width="49%" />
 </p>
 
-You can also display multiple slicers at once
+You can also display multiple slicers at once 🤯
 ```Python
 import radvis as rv
 import numpy as np
@@ -110,20 +110,20 @@ rsg.update_slider_heights(0.05)
 
 rsg.display()
 ```
-## Processing Module
+## 🏄 Processing Module
 
 The processing module of RadVis offers a set of functions to perform preprocessing tasks
 
-### Clipping
+### 🔪 Clipping
 The `percentile_clipping` function clips pixel intensities above and below percentile ranges
 
-### Noise Reduction
+### 🕶️ Noise Reduction
 The `noise_reduction` function reduces the amount of noise in the image
 
-### Normalization
+### 🔥 Normalization
 The `normalization` function normalizes the pixel intensities of the image to a specified range.
 
-### Padding
+### 🛏️ Padding
 The `add_padding` function adds padding evenly to match a target shape
 
 Example usage of processing functions:
