@@ -1,11 +1,5 @@
 # RadVis
-RadVis (Radiology Visualization) is a visualization tool for medical images.
-
-Currently implemented features:
-- Load both DICOM and NIFTI images
-- Can display 2D slices of the 3D images
-- Ability to add a mask to the image
-- Works in both notebooks and scripts
+RadVis (Radiology Visualization) is a visualization tool for medical images. 
 
 ## Installation
 `pip install radvis`
@@ -91,6 +85,31 @@ slicer.save_frame(f"images/axis_{AXIS}_brain_seg.png", index=180, dpi=300)
   <img src="https://raw.githubusercontent.com/medlee-code/RadVis/main/images/axis_2_brain_seg.gif?token=GHSAT0AAAAAACBJZC7PDVRWL2CW2OCTUV3CZC7T5BQ" width="49%" />
 </p>
 
+You can also display multiple slicers at once
+```Python
+import radvis as rv
+import numpy as np
+
+img1 = rv.from_numpy(np.random.rand(50, 10, 10))
+img2 = rv.from_numpy(np.random.rand(10, 50, 10))
+img3 = rv.from_numpy(np.random.rand(10, 10, 50))
+img4 = rv.from_numpy(np.random.rand(50, 10, 10))
+img5 = rv.from_numpy(np.random.rand(10, 50, 10))
+img6 = rv.from_numpy(np.random.rand(10, 10, 50))
+
+rs1 = rv.RadSlicer(img1, title="Image 1")
+rs2 = rv.RadSlicer(img2, title="Image 2")
+rs3 = rv.RadSlicer(img3, title="Image 3")
+rs4 = rv.RadSlicer(img4, title="Image 4")
+rs5 = rv.RadSlicer(img5, title="Image 5")
+rs6 = rv.RadSlicer(img6, title="Image 6")
+
+rsg = rv.RadSlicerGroup([rs1, rs2, rs3, rs4, rs5, rs6], rows=2, cols=3)
+
+rsg.update_slider_heights(0.05)
+
+rsg.display()
+```
 ## Processing Module
 
 The processing module of RadVis offers a set of functions to perform preprocessing tasks

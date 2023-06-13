@@ -4,7 +4,7 @@ from matplotlib.widgets import Slider
 
 
 class RadSlicerGroup:
-    def __init__(self, radslicers: list[RadSlicer], rows: int, cols: int) -> None:
+    def __init__(self, radslicers: list[RadSlicer], rows: int, cols: int = 1) -> None:
         """
         Initialize the RadSlicerGroup class.
 
@@ -16,6 +16,7 @@ class RadSlicerGroup:
         self.rows = rows
         self.cols = cols
         self._verify_dimensions()
+        self.fig, self.axes = plt.subplots(self.rows, self.cols, figsize=(self._get_figure_width(), self._get_figure_height()))
 
     def _verify_dimensions(self) -> None:
         """
@@ -36,15 +37,29 @@ class RadSlicerGroup:
         """
         return self.rows * sum([rs.height for rs in self.radslicers])
     
+    def _update_image(self, val:int):
+        """
+        Updates each RadSlider for the provided image
+        """ 
+        for radslicer in self.radslicers:
+            radslicer._update_image(val)
+    
+    def update_slider_heights(self, height: float) -> None:
+        """
+        Updates the height of the slider for each RadSlicer.
+
+        :param height: The height of the slider
+        """
+        for radslicer in self.radslicers:
+            radslicer.slider_height = height
+
     def display(self, initial_index: int = 0) -> None:
         """
         Display the RadSlicers in a grid.
         """
-        fig, axes = plt.subplots(self.rows, self.cols, figsize=(self._get_figure_width(), self._get_figure_height()))
-        axes = axes.flatten()
+        axes = self.axes.flatten()
 
-        for i, (radslicer, ax) in enumerate(zip(self.radslicers, axes)):
+        for _, (radslicer, ax) in enumerate(zip(self.radslicers, axes)):
             radslicer.display(ax=ax, initial_index=initial_index, show_plot=False)
 
-        plt.tight_layout()
         plt.show()

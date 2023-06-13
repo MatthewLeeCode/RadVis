@@ -16,13 +16,20 @@ except ImportError:
 
 class RadSlicer:
     def __init__(self, radimage: RadImage, axis: int = 0, title=None, cmap: str = "gray",
-                 width:int=4, height:int=4, show_slider:bool = True) -> None:
+                 width:int=4, height:int=4, show_slider:bool = True, slider_height:float=0.05,
+                 slider_color:str='green', show_axis=True) -> None:
         """
         Initialize the RadSlicer class.
 
         :param radimage: A RadImage object containing the image data
         :param axis: The image axis to slice along, defaults to 0
         :param cmap: The colormap to use for displaying the image, defaults to "gray"
+        :param width: The width of the figure, defaults to 4
+        :param height: The height of the figure, defaults to 4
+        :param show_slider: Whether or not to show the slider, defaults to True
+        :param slider_height: The height of the slider, defaults to 0.03
+        :param slider_color: The color of the slider, defaults to 'blue'
+        :param show_axis: Whether or not to show the axis, defaults to True
         """
         self.radimage = radimage
         self.axis = axis
@@ -37,6 +44,9 @@ class RadSlicer:
         self._figsize = (width, height)
         self._notebook_environment = IPython.get_ipython().__class__.__name__ == 'ZMQInteractiveShell'
         self._slider_coords = None
+        self._slider_height = slider_height
+        self._slider_color = slider_color
+        self._show_axis = show_axis
         
     @property
     def title(self):
@@ -68,6 +78,24 @@ class RadSlicer:
         """
         return self._figsize
 
+    @property
+    def slider_height(self):
+        """
+        Returns the height of the slider.
+        """
+        return self._slider_height
+    
+    @slider_height.setter
+    def slider_height(self, value:float):
+        """
+        Sets the height of the slider.
+
+        :param value: The height of the slider
+        """
+        self._slider_height = value
+        if self._show_slider and self._slider is not None:
+            self._update_slider()
+    
     def remove_slider(self) -> None:
         """
         Remove the slider from the plot.
@@ -100,6 +128,18 @@ class RadSlicer:
                           mask[:, image_slice, :] if self.axis == 1 else
                           mask[:, :, image_slice])
         self.fig.canvas.draw_idle()
+    
+    def _calculate_slider_position(self, ax: plt.Axes) -> tuple[float, float, float, float]:
+        # Get the bounding box of the original axis
+        bbox = ax.get_position()
+
+        # Calculate the width, height, left, and bottom parameters for the slider
+        width = bbox.width
+        height = 0.02  # You can adjust this as needed
+        left = bbox.x0
+        bottom = bbox.y0 - self._slider_height  # Place slider below axis, with a small gap
+
+        return left, bottom, width, height
 
     def _create_slider(self, ax: plt.Axes, initial_index: int = 0) -> Slider|None:
         """
@@ -117,20 +157,25 @@ class RadSlicer:
                               val=IntSlider(min=0, max=self.radimage.shape[self.axis]-1, step=1, value=initial_index, 
                                             description=f"{self.title}: Slice"))
         else:
-            ax_position = ax.get_position()
-            slider_width = ax_position.width - 0.2
-            slider_height = 0.03
-            slider_x = ax_position.x0 + 0.1
-            slider_y = ax_position.y0 - 0.15
-            
-            if self._slider_coords is not None:
-                slider_x, slider_y, slider_width, slider_height = self._slider_coords
-                
+            slider_x, slider_y, slider_width, slider_height = self._calculate_slider_position(ax)
             ax_slider = plt.axes([slider_x, slider_y, slider_width, slider_height])
             slider = Slider(ax_slider, f"Slice", 0, self.radimage.shape[self.axis] - 1, valstep=1, valfmt="%d",
-                                valinit=initial_index)
+                                valinit=initial_index, color=self._slider_color)
             slider.on_changed(self._update_image)
         return slider
+
+    def _update_slider(self, initial_index: int = 0) -> None:
+        """
+        Removes the old slider and updates with a new slider
+
+        :param initial_index: The initial slice index, defaults to 0
+        """
+        if self._slider is not None:
+            self._slider.ax.remove()
+            self._slider = None
+        self._slider = self._create_slider(self._ax, initial_index)
+        if self._slider is not None:
+            self.fig.canvas.draw()
     
     def _plot_image(self, ax: plt.Axes, initial_index: int = 0) -> None:
         """
@@ -146,6 +191,12 @@ class RadSlicer:
             vmax=self.radimage.image_data.max(),
             interpolation='none'
         )
+
+        if self._show_axis:
+            ax.axis('on')
+        else:
+            ax.axis('off')
+
         for mask, cmap, alpha in self._masks:
             mask_plot = ax.imshow(mask[initial_index, :, :] if self.axis == 0 else
                       mask[:, initial_index, :] if self.axis == 1 else
@@ -153,7 +204,6 @@ class RadSlicer:
                       cmap=cmap, interpolation='none', alpha=alpha,
                       vmin=0, vmax=mask.max())
             self._mask_plots.append(mask_plot)
-        self._slider = self._create_slider(ax, initial_index)
 
 
     def display(self, ax: plt.Axes = None, initial_index: int = 0, show_plot=True) -> None:
@@ -172,8 +222,9 @@ class RadSlicer:
                
         self._ax.set_title(self.title, y=1)
         self.fig.set_size_inches(self._figsize[0], self._figsize[1], forward=False)
-        
+        self._update_slider(initial_index)
         self._plot_image(self._ax, initial_index)
+
         
         if show_plot:
             plt.show()
